@@ -77,7 +77,7 @@ List OLSvsIV_limit_sim(double tau, double pi_sq, int n_sim = 10000){
 //' as.data.fram(foo)
 // [[Rcpp::export]]
 List OLSvsIV_nonsimCI(double tau, double pi_sq, double size = 0.05,
-                      int n_sim = 10000){
+                      int n_sim = 50000){
   limit_sim_OLS_IV sims(tau, pi_sq, n_sim);
   double tau_var = (1 - pi_sq) / pi_sq;
   arma::vec w = tau_var / arma::pow(sims.tauhat, 2);

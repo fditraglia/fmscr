@@ -47,7 +47,7 @@ OLSvsIV_limit_sim <- function(tau, pi_sq, n_sim = 10000L) {
 #' @examples
 #' foo <- OLSvsIV_nonsimCI(tau = 3, pi_sq = 0.1)
 #' as.data.fram(foo)
-OLSvsIV_nonsimCI <- function(tau, pi_sq, size = 0.05, n_sim = 10000L) {
+OLSvsIV_nonsimCI <- function(tau, pi_sq, size = 0.05, n_sim = 50000L) {
     .Call('fmscr_OLSvsIV_nonsimCI', PACKAGE = 'fmscr', tau, pi_sq, size, n_sim)
 }
 

@@ -4,7 +4,7 @@
 \alias{OLSvsIV_nonsimCI}
 \title{Coverage and Width of OLS, TSLS and Naive CIs}
 \usage{
-OLSvsIV_nonsimCI(tau, pi_sq, size = 0.05, n_sim = 10000L)
+OLSvsIV_nonsimCI(tau, pi_sq, size = 0.05, n_sim = 50000L)
 }
 \arguments{
 \item{tau}{Controls degree of endogeneity of OLS.}
