@@ -133,3 +133,35 @@ double median_width(arma::mat conf_intervals){
 }
 
 
+//' Calculate shortest two-sided confidence interval
+//'
+//' @param x Vector of simulations from sampling distribution of an estimator.
+//' @param size One minus the desired coverage probability.
+//' @param inc Step size for grid over which width is minimized.
+//' @return Shortest (1 - size) * 100 percent interval based on the data provided.
+//' @examples
+//' x <- rnorm(1000)
+//' shortest_CI(x)
+// [[Rcpp::export]]
+arma::rowvec shortest_CI(arma::vec x, double size = 0.05, double inc = 0.001){
+  int n_inc = size / inc - 1;
+  arma::vec aL = arma::linspace(inc, size - inc, n_inc);
+  arma::vec aU = 1 - (size - aL);
+  arma::vec L(n_inc);
+  arma::vec U(n_inc);
+  for(int i = 0; i < n_inc; i++){
+    L(i) = sample_quantile(x, aL(i));
+    U(i) = sample_quantile(x, aU(i));
+  }
+  arma::vec widths = U - L;
+  arma::uword min_index;
+  widths.min(min_index);
+  arma::rowvec out(2);
+  out(0) = L(min_index);
+  out(1) = U(min_index);
+  return(out);
+}
+
+
+
+

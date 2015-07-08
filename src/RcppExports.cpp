@@ -6,6 +6,19 @@
 
 using namespace Rcpp;
 
+// OLSvsIV_limit_sim
+List OLSvsIV_limit_sim(double tau, double pi_sq, int n_sim);
+RcppExport SEXP fmscr_OLSvsIV_limit_sim(SEXP tauSEXP, SEXP pi_sqSEXP, SEXP n_simSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< double >::type tau(tauSEXP);
+    Rcpp::traits::input_parameter< double >::type pi_sq(pi_sqSEXP);
+    Rcpp::traits::input_parameter< int >::type n_sim(n_simSEXP);
+    __result = Rcpp::wrap(OLSvsIV_limit_sim(tau, pi_sq, n_sim));
+    return __result;
+END_RCPP
+}
 // mvrnorm
 arma::mat mvrnorm(int n, arma::vec mu, arma::mat Sigma);
 RcppExport SEXP fmscr_mvrnorm(SEXP nSEXP, SEXP muSEXP, SEXP SigmaSEXP) {
@@ -76,6 +89,19 @@ BEGIN_RCPP
     Rcpp::RNGScope __rngScope;
     Rcpp::traits::input_parameter< arma::mat >::type conf_intervals(conf_intervalsSEXP);
     __result = Rcpp::wrap(median_width(conf_intervals));
+    return __result;
+END_RCPP
+}
+// shortest_CI
+arma::rowvec shortest_CI(arma::vec x, double size, double inc);
+RcppExport SEXP fmscr_shortest_CI(SEXP xSEXP, SEXP sizeSEXP, SEXP incSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< arma::vec >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type size(sizeSEXP);
+    Rcpp::traits::input_parameter< double >::type inc(incSEXP);
+    __result = Rcpp::wrap(shortest_CI(x, size, inc));
     return __result;
 END_RCPP
 }
