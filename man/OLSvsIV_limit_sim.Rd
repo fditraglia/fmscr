@@ -14,8 +14,9 @@ OLSvsIV_limit_sim(tau, pi_sq, n_sim = 10000L)
 \item{n_sim}{Number of simulation draws.}
 }
 \value{
-Dataframe of draws from the limit experiment for OLS, TSLS and the
-sample estimator of tau.
+List of draws from the limit experiment for OLS, TSLS and the
+sample estimator of tau, as well as the mean vector and covariance matrix
+used in the simulation.
 }
 \description{
 Testing interface to limit_sim_OLS_IV class.

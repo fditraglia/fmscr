@@ -164,4 +164,3 @@ arma::rowvec shortest_CI(arma::vec x, double size = 0.05, double inc = 0.001){
 
 
 
-

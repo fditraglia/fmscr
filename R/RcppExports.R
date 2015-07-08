@@ -6,8 +6,9 @@
 #' @param tau Controls degree of endogeneity of OLS.
 #' @param pi_sq First-stage R-squared (strengh of instruments).
 #' @param n_sim Number of simulation draws.
-#' @return Dataframe of draws from the limit experiment for OLS, TSLS and the
-#' sample estimator of tau.
+#' @return List of draws from the limit experiment for OLS, TSLS and the
+#' sample estimator of tau, as well as the mean vector and covariance matrix
+#' used in the simulation.
 #' @details This is a testing interface to the C++ class that is used to draw
 #' from the limit experiment in the OLS versus TSLS simulation experiment from
 #' section 5.1 of the paper.
@@ -16,6 +17,10 @@
 #' cov(data.frame(ols = foo$ols, tsls = foo$tsls, tauhat = foo$tauhat))
 OLSvsIV_limit_sim <- function(tau, pi_sq, n_sim = 10000L) {
     .Call('fmscr_OLSvsIV_limit_sim', PACKAGE = 'fmscr', tau, pi_sq, n_sim)
+}
+
+OLSvsIV_nonsimCI <- function(tau, pi_sq, size = 0.05, n_sim = 10000L) {
+    .Call('fmscr_OLSvsIV_nonsimCI', PACKAGE = 'fmscr', tau, pi_sq, size, n_sim)
 }
 
 #' Generate draws from a multivariate normal distribution
