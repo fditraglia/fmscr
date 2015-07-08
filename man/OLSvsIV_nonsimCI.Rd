@@ -43,6 +43,6 @@ of the deficiencies of the naive interval.
 }
 \examples{
 foo <- OLSvsIV_nonsimCI(tau = 3, pi_sq = 0.1)
-as.data.fram(foo)
+as.data.frame(foo)
 }
 

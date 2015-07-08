@@ -74,7 +74,7 @@ List OLSvsIV_limit_sim(double tau, double pi_sq, int n_sim = 10000){
 //' of the deficiencies of the naive interval.
 //' @examples
 //' foo <- OLSvsIV_nonsimCI(tau = 3, pi_sq = 0.1)
-//' as.data.fram(foo)
+//' as.data.frame(foo)
 // [[Rcpp::export]]
 List OLSvsIV_nonsimCI(double tau, double pi_sq, double size = 0.05,
                       int n_sim = 50000){
