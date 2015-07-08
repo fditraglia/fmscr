@@ -47,6 +47,34 @@ List OLSvsIV_limit_sim(double tau, double pi_sq, int n_sim = 10000){
 }
 
 
+//' Coverage and Width of OLS, TSLS and Naive CIs
+//'
+//' @param tau Controls degree of endogeneity of OLS.
+//' @param pi_sq First-stage R-squared (strengh of instruments).
+//' @param size One minus the norminal coverage probability of the intervals.
+//' @param n_sim Number of simulation draws.
+//' @return List containing empirical coverage probabilities and median width
+//' of confidence intervals for the OLS and TSLS estimators and the same for a
+//' "naive" confidence interval for the FMSC-selected estimator.
+//' @details This function gives results based on simulations from the limit
+//' experiment for the OLS versus TSLS example in Section 5.1 of the paper.
+//' The confidence intervals computed here are for the non-simulation based
+//' procedures: the OLS estimator, the TSLS estimator and a naive interval for
+//' the post-FMSC estimator. This naive interval is constructed from the
+//' textbook interval for whichever estimator the FMSC selects: if OLS is
+//' selected it uses the standard OLS interval, and if TSLS is selected it uses
+//' the TSLS interval. This procedure can perform very badly depending on
+//' parameter values. Note that the median widths in this example are not
+//' particularly interesting: the width of each OLS and TSLS interval is fixed
+//' across all simulations and the median width of the naive interval equals
+//' that of OLS when OLS is chosen more than 50 percent of the time and equals
+//' that of TSLS otherwise. The median widths are provided merely for
+//' consistency with other functions for which this quantity is more
+//' interesting, namely the simulation-based intervals that try to correct some
+//' of the deficiencies of the naive interval.
+//' @examples
+//' foo <- OLSvsIV_nonsimCI(tau = 3, pi_sq = 0.1)
+//' as.data.fram(foo)
 // [[Rcpp::export]]
 List OLSvsIV_nonsimCI(double tau, double pi_sq, double size = 0.05,
                       int n_sim = 10000){
@@ -87,3 +115,20 @@ List OLSvsIV_nonsimCI(double tau, double pi_sq, double size = 0.05,
                       Named("olsWidth") = olsWidth,
                     Named("naiveWidth") = naiveWidth));
 }
+
+
+// one_step <- function(size, tau.star, pi.sq, n.sims = 1000, inc = 0.005){
+//   sims <- limit_sim(tau.star, pi.sq, 1000)
+//   tau.var <- (1 - pi.sq) / pi.sq
+//   w <- tau.var / sims$tau.hat^2
+//   wfmsc <- w >= 0.5
+//   sims$fmsc <- ifelse(wfmsc, sims$ols, sims$tsls)
+//   wavg <- ifelse(w >= 1, 1, w)
+//   sims$avg <- wavg * sims$ols + (1 - wavg) * sims$tsls
+//
+//   fmscCI <- shortest_CI(sims$fmsc, size)
+//   names(fmscCI) <- c("fmscL", "fmscU")
+//   avgCI <- shortest_CI(sims$avg, size)
+//   names(avgCI) <- c("avgL", "avgU")
+//   return(c(fmscCI, avgCI))
+// }
