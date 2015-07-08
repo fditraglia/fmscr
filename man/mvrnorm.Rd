@@ -14,7 +14,7 @@ mvrnorm(n, mu, Sigma)
 \item{Sigma}{Covariance matrix.}
 }
 \value{
-Draws from the normal distribution.
+Matrix of draws from the normal distribution: each row is a draw.
 }
 \description{
 Generate draws from a multivariate normal distribution

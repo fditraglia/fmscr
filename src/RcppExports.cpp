@@ -31,6 +31,54 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// MSE_trim
+double MSE_trim(arma::colvec x, double truth, double trim);
+RcppExport SEXP fmscr_MSE_trim(SEXP xSEXP, SEXP truthSEXP, SEXP trimSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< arma::colvec >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type truth(truthSEXP);
+    Rcpp::traits::input_parameter< double >::type trim(trimSEXP);
+    __result = Rcpp::wrap(MSE_trim(x, truth, trim));
+    return __result;
+END_RCPP
+}
+// MAD
+double MAD(arma::colvec x, double truth);
+RcppExport SEXP fmscr_MAD(SEXP xSEXP, SEXP truthSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< arma::colvec >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type truth(truthSEXP);
+    __result = Rcpp::wrap(MAD(x, truth));
+    return __result;
+END_RCPP
+}
+// coverage_prob
+double coverage_prob(arma::mat conf_intervals, double truth);
+RcppExport SEXP fmscr_coverage_prob(SEXP conf_intervalsSEXP, SEXP truthSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< arma::mat >::type conf_intervals(conf_intervalsSEXP);
+    Rcpp::traits::input_parameter< double >::type truth(truthSEXP);
+    __result = Rcpp::wrap(coverage_prob(conf_intervals, truth));
+    return __result;
+END_RCPP
+}
+// median_width
+double median_width(arma::mat conf_intervals);
+RcppExport SEXP fmscr_median_width(SEXP conf_intervalsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< arma::mat >::type conf_intervals(conf_intervalsSEXP);
+    __result = Rcpp::wrap(median_width(conf_intervals));
+    return __result;
+END_RCPP
+}
 // rcpp_hello
 List rcpp_hello();
 RcppExport SEXP fmscr_rcpp_hello() {

@@ -6,7 +6,7 @@ using namespace Rcpp;
 //' @param n Number of samples.
 //' @param mu Mean vector.
 //' @param Sigma Covariance matrix.
-//' @return Draws from the normal distribution.
+//' @return Matrix of draws from the normal distribution: each row is a draw.
 //' @details This is essentially a stripped-down version of the mvrnorm function
 //' from the MASS library in R. Through the magic of Rcpp we're transforming the
 //' same standard normal draws as the R version. However, since Armadillo
@@ -50,3 +50,86 @@ double sample_quantile(arma::colvec x, double p){
   arma::colvec x_sort = sort(x);
   return((1 - g) * x_sort(j - 1) + g * x_sort(j));
 }
+
+//' Calculate (trimmed) mean-squared error.
+//'
+//' @param x Vector of estimates.
+//' @param true True parameter value.
+//' @param trim Fraction of estimates to discard (half from each tail) before
+//' calculating MSE (defaults to zero)
+//' @return (trimmed) mean-squared error
+//' @examples
+//' x <- rnorm(1000) + 0.5
+//' MSE_trim(x, 0)
+//' MSE_trim(x, 0, 0.1)
+// [[Rcpp::export]]
+double MSE_trim(arma::colvec x, double truth, double trim = 0.0){
+  int k = x.n_elem;
+  int tail_drop = ceil(k * trim / 2);
+  arma::colvec x_trimmed = sort(x);
+  x_trimmed = x_trimmed(arma::span(tail_drop, k - tail_drop - 1));
+  arma::colvec truth_vec = truth * arma::ones(x_trimmed.n_elem);
+  arma::colvec errors = x_trimmed - truth_vec;
+  double MSE = dot(errors, errors) / errors.n_elem;
+  return(MSE);
+}
+
+//' Calculate median absolute deviation
+//'
+//' @param x Vector of estimates.
+//' @param truth True value of the parameter.
+//' @return Median absolute deviation.
+//' @examples
+//' x <- rnorm(1000) + 0.5
+//' MAD(x, 0)
+// [[Rcpp::export]]
+double MAD(arma::colvec x, double truth){
+  arma::colvec truth_vec = truth * arma::ones(x.n_rows);
+  arma::colvec abs_dev = abs(x - truth_vec);
+  return(median(abs_dev));
+}
+
+
+//' Calculate the empirical coverage probability of a matrix of confidence
+//' intervals.
+//'
+//' @param conf_intervals Matrix of confidence intervals in which each row is a
+//' CI, the first column is the lower confidence limit, and the second column is
+//' the upper confidence limit.
+//' @param truth True value of the parameter for which the CIs were constructed.
+//' @return Empirical coverage probability.
+//' @examples
+//' xbar <- replicate(1000, mean(rnorm(25)))
+//' ME <- qnorm(0.975) / 5
+//' CIs <- cbind(xbar - ME, xbar + ME)
+//' coverage_prob(CIs, 0)
+// [[Rcpp::export]]
+double coverage_prob(arma::mat conf_intervals, double truth){
+  arma::colvec truth_vec = truth * arma::ones(conf_intervals.n_rows);
+  arma::colvec cover_lower = arma::conv_to<arma::colvec>
+                    ::from(conf_intervals.col(0) < truth_vec);
+  arma::colvec cover_upper = arma::conv_to<arma::colvec>
+                    ::from(conf_intervals.col(1) > truth_vec);
+  arma::colvec cover = cover_lower % cover_upper;
+  return(sum(cover) / cover.n_elem);
+}
+
+
+//' Calculate empirical median width of a matrix of confidence intervals.
+//'
+//' @param conf_intervals Matrix of confidence intervals in which each row is a
+//' CI, the first column is the lower confidence limit, and the second column is
+//' the upper confidence limit.
+//' @return Empirical median width of the confidence intervals.
+//' @examples
+//' xbar <- replicate(1000, mean(rnorm(25)))
+//' ME <- qnorm(0.975) / 5
+//' CIs <- cbind(xbar - ME, xbar + ME)
+//' median_width(CIs)
+// [[Rcpp::export]]
+double median_width(arma::mat conf_intervals){
+  arma::colvec width = conf_intervals.col(1) - conf_intervals.col(0);
+  return(median(width));
+}
+
+

@@ -6,7 +6,7 @@
 #' @param n Number of samples.
 #' @param mu Mean vector.
 #' @param Sigma Covariance matrix.
-#' @return Draws from the normal distribution.
+#' @return Matrix of draws from the normal distribution: each row is a draw.
 #' @details This is essentially a stripped-down version of the mvrnorm function
 #' from the MASS library in R. Through the magic of Rcpp we're transforming the
 #' same standard normal draws as the R version. However, since Armadillo
@@ -34,6 +34,65 @@ mvrnorm <- function(n, mu, Sigma) {
 #' sample_quantile(foo, 0.16)
 sample_quantile <- function(x, p) {
     .Call('fmscr_sample_quantile', PACKAGE = 'fmscr', x, p)
+}
+
+#' Calculate (trimmed) mean-squared error.
+#'
+#' @param x Vector of estimates.
+#' @param true True parameter value.
+#' @param trim Fraction of estimates to discard (half from each tail) before
+#' calculating MSE (defaults to zero)
+#' @return (trimmed) mean-squared error
+#' @examples
+#' x <- rnorm(1000) + 0.5
+#' MSE_trim(x, 0)
+#' MSE_trim(x, 0, 0.1)
+MSE_trim <- function(x, truth, trim = 0.0) {
+    .Call('fmscr_MSE_trim', PACKAGE = 'fmscr', x, truth, trim)
+}
+
+#' Calculate median absolute deviation
+#'
+#' @param x Vector of estimates.
+#' @param truth True value of the parameter.
+#' @return Median absolute deviation.
+#' @examples
+#' x <- rnorm(1000) + 0.5
+#' MAD(x, 0)
+MAD <- function(x, truth) {
+    .Call('fmscr_MAD', PACKAGE = 'fmscr', x, truth)
+}
+
+#' Calculate the empirical coverage probability of a matrix of confidence
+#' intervals.
+#'
+#' @param conf_intervals Matrix of confidence intervals in which each row is a
+#' CI, the first column is the lower confidence limit, and the second column is
+#' the upper confidence limit.
+#' @param truth True value of the parameter for which the CIs were constructed.
+#' @return Empirical coverage probability.
+#' @examples
+#' xbar <- replicate(1000, mean(rnorm(25)))
+#' ME <- qnorm(0.975) / 5
+#' CIs <- cbind(xbar - ME, xbar + ME)
+#' coverage_prob(CIs, 0)
+coverage_prob <- function(conf_intervals, truth) {
+    .Call('fmscr_coverage_prob', PACKAGE = 'fmscr', conf_intervals, truth)
+}
+
+#' Calculate empirical median width of a matrix of confidence intervals.
+#'
+#' @param conf_intervals Matrix of confidence intervals in which each row is a
+#' CI, the first column is the lower confidence limit, and the second column is
+#' the upper confidence limit.
+#' @return Empirical median width of the confidence intervals.
+#' @examples
+#' xbar <- replicate(1000, mean(rnorm(25)))
+#' ME <- qnorm(0.975) / 5
+#' CIs <- cbind(xbar - ME, xbar + ME)
+#' median_width(CIs)
+median_width <- function(conf_intervals) {
+    .Call('fmscr_median_width', PACKAGE = 'fmscr', conf_intervals)
 }
 
 rcpp_hello <- function() {
