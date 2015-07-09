@@ -69,8 +69,12 @@ OLSvsIV_nonsimCI <- function(tau, pi_sq, size = 0.05, n_sim = 50000L) {
 #' it abstracts from sampling uncertainty.)
 #' @examples
 #' as.data.frame(OLSvsIV_second_step(tau = 3, pi_sq = 0.1))
-OLSvsIV_second_step <- function(tau, pi_sq, size = 0.05, inc = 0.001, n_sim = 1000L) {
+OLSvsIV_second_step <- function(tau, pi_sq, size = 0.05, inc = 0.005, n_sim = 1000L) {
     .Call('fmscr_OLSvsIV_second_step', PACKAGE = 'fmscr', tau, pi_sq, size, inc, n_sim)
+}
+
+OLSvsIV_onestepCI <- function(tau, pi_sq, size = 0.05, inc = 0.005, n_sim_outer = 1000L, n_sim_inner = 1000L) {
+    .Call('fmscr_OLSvsIV_onestepCI', PACKAGE = 'fmscr', tau, pi_sq, size, inc, n_sim_outer, n_sim_inner)
 }
 
 #' Generate draws from a multivariate normal distribution

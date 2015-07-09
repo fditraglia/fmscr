@@ -4,7 +4,7 @@
 \alias{OLSvsIV_second_step}
 \title{Testing interface to second_step_OLS_IV class.}
 \usage{
-OLSvsIV_second_step(tau, pi_sq, size = 0.05, inc = 0.001, n_sim = 1000L)
+OLSvsIV_second_step(tau, pi_sq, size = 0.05, inc = 0.005, n_sim = 1000L)
 }
 \arguments{
 \item{tau}{Controls degree of endogeneity of OLS.}

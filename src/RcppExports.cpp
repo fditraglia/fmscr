@@ -48,6 +48,22 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// OLSvsIV_onestepCI
+List OLSvsIV_onestepCI(double tau, double pi_sq, double size, double inc, int n_sim_outer, int n_sim_inner);
+RcppExport SEXP fmscr_OLSvsIV_onestepCI(SEXP tauSEXP, SEXP pi_sqSEXP, SEXP sizeSEXP, SEXP incSEXP, SEXP n_sim_outerSEXP, SEXP n_sim_innerSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< double >::type tau(tauSEXP);
+    Rcpp::traits::input_parameter< double >::type pi_sq(pi_sqSEXP);
+    Rcpp::traits::input_parameter< double >::type size(sizeSEXP);
+    Rcpp::traits::input_parameter< double >::type inc(incSEXP);
+    Rcpp::traits::input_parameter< int >::type n_sim_outer(n_sim_outerSEXP);
+    Rcpp::traits::input_parameter< int >::type n_sim_inner(n_sim_innerSEXP);
+    __result = Rcpp::wrap(OLSvsIV_onestepCI(tau, pi_sq, size, inc, n_sim_outer, n_sim_inner));
+    return __result;
+END_RCPP
+}
 // mvrnorm
 arma::mat mvrnorm(int n, arma::vec mu, arma::mat Sigma);
 RcppExport SEXP fmscr_mvrnorm(SEXP nSEXP, SEXP muSEXP, SEXP SigmaSEXP) {

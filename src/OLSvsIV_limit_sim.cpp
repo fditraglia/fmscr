@@ -2,6 +2,8 @@
 #include "helper_functions.h"
 using namespace Rcpp;
 
+// NEED TO REWRITE THIS TO GENERATE DIRECTLY FROM M1 M2
+// TO AVOID NUMERICAL ISSUES WITH EIGEN-DECOMP WHEN PI_SQ IS SMALL!
 // Class to simulate from the limit experiment for the example from Section 5.1
 class limit_sim_OLS_IV {
   public:
@@ -108,12 +110,12 @@ List OLSvsIV_nonsimCI(double tau, double pi_sq, double size = 0.05,
   double olsWidth = median_width(arma::join_rows(olsL, olsU));
   double tslsWidth = median_width(arma::join_rows(tslsL, tslsU));
 
-  return(List::create(Named("tslsCover") = tslsCover,
+  return List::create(Named("tslsCover") = tslsCover,
                       Named("olsCover") = olsCover,
                       Named("naiveCover") = naiveCover,
                       Named("tslsWidth") = tslsWidth,
                       Named("olsWidth") = olsWidth,
-                    Named("naiveWidth") = naiveWidth));
+                      Named("naiveWidth") = naiveWidth);
 }
 
 // Class to implement "second-step" of two-stage CI procedure from Section 4.3
@@ -170,3 +172,22 @@ List OLSvsIV_second_step(double tau, double pi_sq, double size = 0.05,
                       Named("avg") = out.avgCI));
 }
 
+// [[Rcpp::export]]
+List OLSvsIV_onestepCI(double tau, double pi_sq, double size = 0.05,
+                       double inc = 0.005, int n_sim_outer = 1000,
+                       int n_sim_inner = 1000){
+  limit_sim_OLS_IV sim_outer(tau, pi_sq, n_sim_outer);
+  arma::mat fmscCIs(n_sim_outer, 2);
+  arma::mat avgCIs(n_sim_outer, 2);
+  double tauhat_temp;
+  for(int i = 0; i < n_sim_outer; i++){
+    tauhat_temp = sim_outer.tauhat(i);
+    second_step_OLS_IV CIs_temp(tauhat_temp, pi_sq, size, inc, n_sim_inner);
+    fmscCIs.row(i) = CIs_temp.fmscCI;
+    avgCIs.row(i) = CIs_temp.avgCI;
+  }
+  return List::create(Named("fmsc1Cover") = coverage_prob(fmscCIs, 0),
+                      Named("avg1Cover") = coverage_prob(avgCIs, 0),
+                      Named("fmsc1Width") = median_width(fmscCIs),
+                      Named("avg1Width") = median_width(avgCIs));
+}
