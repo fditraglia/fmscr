@@ -155,8 +155,15 @@ second_step_OLS_IV::second_step_OLS_IV(double tau, double pi_sq,
   fmsc.elem(use_tsls) = sims.tsls.elem(use_tsls);
   wavg = arma::clamp(w, 0.0, 1.0);
   avg = wavg % sims.ols + (1 - wavg) % sims.tsls; // element-wise mult.
+  if(inc != 0.0){
   fmscCI = shortest_CI(fmsc, size, inc);
   avgCI = shortest_CI(avg, size, inc);
+  }else{
+    fmscCI << sample_quantile(fmsc, size / 2)
+           << sample_quantile(fmsc, 1 - size / 2) << arma::endr;
+    avgCI << sample_quantile(avg, size / 2)
+          << sample_quantile(avg, 1 - size / 2) << arma::endr;
+  }
 }
 
 
