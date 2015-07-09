@@ -127,7 +127,7 @@ class second_step_OLS_IV {
 };
 // Class constructor
 second_step_OLS_IV::second_step_OLS_IV(double tau, double pi_sq,
-                                       double size = 0.05, double inc = 0.001,
+                                       double size = 0.05, double inc = 0.005,
                                        int n_sim = 1000){
   limit_sim_OLS_IV sims(tau, pi_sq, n_sim);
   double tau_var = (1 - pi_sq) / pi_sq;
@@ -164,7 +164,7 @@ second_step_OLS_IV::second_step_OLS_IV(double tau, double pi_sq,
 //' as.data.frame(OLSvsIV_second_step(tau = 3, pi_sq = 0.1))
 // [[Rcpp::export]]
 List OLSvsIV_second_step(double tau, double pi_sq, double size = 0.05,
-                         double inc = 0.001, int n_sim = 1000){
+                         double inc = 0.005, int n_sim = 1000){
   second_step_OLS_IV out(tau, pi_sq, size, inc, n_sim);
   return(List::create(Named("fmsc") = out.fmscCI,
                       Named("avg") = out.avgCI));
