@@ -13,7 +13,7 @@ OLSvsIV_nonsimCI(tau, pi_sq, size = 0.05, n_sim = 50000L)
 
 \item{size}{One minus the norminal coverage probability of the intervals.}
 
-\item{n_sim}{Number of simulation draws.}
+\item{n_sim}{Number of simulation draws from the limit experiment.}
 }
 \value{
 List containing empirical coverage probabilities and median width

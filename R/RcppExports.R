@@ -24,7 +24,7 @@ OLSvsIV_limit_sim <- function(tau, pi_sq, n_sim = 10000L) {
 #' @param tau Controls degree of endogeneity of OLS.
 #' @param pi_sq First-stage R-squared (strengh of instruments).
 #' @param size One minus the norminal coverage probability of the intervals.
-#' @param n_sim Number of simulation draws.
+#' @param n_sim Number of simulation draws from the limit experiment.
 #' @return List containing empirical coverage probabilities and median width
 #' of confidence intervals for the OLS and TSLS estimators and the same for a
 #' "naive" confidence interval for the FMSC-selected estimator.
@@ -49,6 +49,28 @@ OLSvsIV_limit_sim <- function(tau, pi_sq, n_sim = 10000L) {
 #' as.data.frame(foo)
 OLSvsIV_nonsimCI <- function(tau, pi_sq, size = 0.05, n_sim = 50000L) {
     .Call('fmscr_OLSvsIV_nonsimCI', PACKAGE = 'fmscr', tau, pi_sq, size, n_sim)
+}
+
+#' Testing interface to second_step_OLS_IV class.
+#'
+#' @param tau Controls degree of endogeneity of OLS.
+#' @param pi_sq First-stage R-squared (strengh of instruments).
+#' @param size One minus the norminal coverage probability of the intervals.
+#' @param inc Step size for grid over which width is minimized.
+#' @param n_sim Number of simulation draws.
+#' @return List with two elements: simulation-based two-sided confidence
+#' interval for the post-FMSC estimator evaluated at tau and the same for the
+#' moment average estimator.
+#' @details This is a testing interface to the C++ class that is use, among
+#' other things, as the second-step in the two-step simulation based confidence
+#' interval construction from Section 4.3 of the paper, based on drawing from
+#' the limit experiment. In this implementation it treats all population
+#' parameters that enter the limit as know with the exception of tau. (That is,
+#' it abstracts from sampling uncertainty.)
+#' @examples
+#' as.data.frame(OLSvsIV_second_step(tau = 3, pi_sq = 0.1))
+OLSvsIV_second_step <- function(tau, pi_sq, size = 0.05, inc = 0.001, n_sim = 1000L) {
+    .Call('fmscr_OLSvsIV_second_step', PACKAGE = 'fmscr', tau, pi_sq, size, inc, n_sim)
 }
 
 #' Generate draws from a multivariate normal distribution

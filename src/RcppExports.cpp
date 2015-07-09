@@ -33,6 +33,21 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// OLSvsIV_second_step
+List OLSvsIV_second_step(double tau, double pi_sq, double size, double inc, int n_sim);
+RcppExport SEXP fmscr_OLSvsIV_second_step(SEXP tauSEXP, SEXP pi_sqSEXP, SEXP sizeSEXP, SEXP incSEXP, SEXP n_simSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< double >::type tau(tauSEXP);
+    Rcpp::traits::input_parameter< double >::type pi_sq(pi_sqSEXP);
+    Rcpp::traits::input_parameter< double >::type size(sizeSEXP);
+    Rcpp::traits::input_parameter< double >::type inc(incSEXP);
+    Rcpp::traits::input_parameter< int >::type n_sim(n_simSEXP);
+    __result = Rcpp::wrap(OLSvsIV_second_step(tau, pi_sq, size, inc, n_sim));
+    return __result;
+END_RCPP
+}
 // mvrnorm
 arma::mat mvrnorm(int n, arma::vec mu, arma::mat Sigma);
 RcppExport SEXP fmscr_mvrnorm(SEXP nSEXP, SEXP muSEXP, SEXP SigmaSEXP) {

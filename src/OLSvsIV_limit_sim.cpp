@@ -2,7 +2,7 @@
 #include "helper_functions.h"
 using namespace Rcpp;
 
-
+// Class to simulate from the limit experiment for the example from Section 5.1
 class limit_sim_OLS_IV {
   public:
     arma::colvec ols, tsls, tauhat, mu;
@@ -52,7 +52,7 @@ List OLSvsIV_limit_sim(double tau, double pi_sq, int n_sim = 10000){
 //' @param tau Controls degree of endogeneity of OLS.
 //' @param pi_sq First-stage R-squared (strengh of instruments).
 //' @param size One minus the norminal coverage probability of the intervals.
-//' @param n_sim Number of simulation draws.
+//' @param n_sim Number of simulation draws from the limit experiment.
 //' @return List containing empirical coverage probabilities and median width
 //' of confidence intervals for the OLS and TSLS estimators and the same for a
 //' "naive" confidence interval for the FMSC-selected estimator.
@@ -116,19 +116,57 @@ List OLSvsIV_nonsimCI(double tau, double pi_sq, double size = 0.05,
                     Named("naiveWidth") = naiveWidth));
 }
 
+// Class to implement "second-step" of two-stage CI procedure from Section 4.3
+class second_step_OLS_IV {
+  public:
+    arma::rowvec fmscCI, avgCI;
+    second_step_OLS_IV(double, double, double, double, int); //Class constructor
+  private:
+    arma::vec w, fmsc, wavg, avg;
+    arma::uvec use_ols, use_tsls;
+};
+// Class constructor
+second_step_OLS_IV::second_step_OLS_IV(double tau, double pi_sq,
+                                       double size = 0.05, double inc = 0.001,
+                                       int n_sim = 1000){
+  limit_sim_OLS_IV sims(tau, pi_sq, n_sim);
+  double tau_var = (1 - pi_sq) / pi_sq;
+  w = tau_var / arma::pow(sims.tauhat, 2);
+  use_ols = find(w >= 0.5);
+  use_tsls = find(w < 0.5);
+  fmsc = arma::vec(n_sim);
+  fmsc.elem(use_ols) = sims.ols.elem(use_ols);
+  fmsc.elem(use_tsls) = sims.tsls.elem(use_tsls);
+  wavg = arma::clamp(w, 0.0, 1.0);
+  avg = wavg % sims.ols + (1 - wavg) % sims.tsls; // element-wise mult.
+  fmscCI = shortest_CI(fmsc, size, inc);
+  avgCI = shortest_CI(avg, size, inc);
+}
 
-// one_step <- function(size, tau.star, pi.sq, n.sims = 1000, inc = 0.005){
-//   sims <- limit_sim(tau.star, pi.sq, 1000)
-//   tau.var <- (1 - pi.sq) / pi.sq
-//   w <- tau.var / sims$tau.hat^2
-//   wfmsc <- w >= 0.5
-//   sims$fmsc <- ifelse(wfmsc, sims$ols, sims$tsls)
-//   wavg <- ifelse(w >= 1, 1, w)
-//   sims$avg <- wavg * sims$ols + (1 - wavg) * sims$tsls
-//
-//   fmscCI <- shortest_CI(sims$fmsc, size)
-//   names(fmscCI) <- c("fmscL", "fmscU")
-//   avgCI <- shortest_CI(sims$avg, size)
-//   names(avgCI) <- c("avgL", "avgU")
-//   return(c(fmscCI, avgCI))
-// }
+
+//' Testing interface to second_step_OLS_IV class.
+//'
+//' @param tau Controls degree of endogeneity of OLS.
+//' @param pi_sq First-stage R-squared (strengh of instruments).
+//' @param size One minus the norminal coverage probability of the intervals.
+//' @param inc Step size for grid over which width is minimized.
+//' @param n_sim Number of simulation draws.
+//' @return List with two elements: simulation-based two-sided confidence
+//' interval for the post-FMSC estimator evaluated at tau and the same for the
+//' moment average estimator.
+//' @details This is a testing interface to the C++ class that is use, among
+//' other things, as the second-step in the two-step simulation based confidence
+//' interval construction from Section 4.3 of the paper, based on drawing from
+//' the limit experiment. In this implementation it treats all population
+//' parameters that enter the limit as know with the exception of tau. (That is,
+//' it abstracts from sampling uncertainty.)
+//' @examples
+//' as.data.frame(OLSvsIV_second_step(tau = 3, pi_sq = 0.1))
+// [[Rcpp::export]]
+List OLSvsIV_second_step(double tau, double pi_sq, double size = 0.05,
+                         double inc = 0.001, int n_sim = 1000){
+  second_step_OLS_IV out(tau, pi_sq, size, inc, n_sim);
+  return(List::create(Named("fmsc") = out.fmscCI,
+                      Named("avg") = out.avgCI));
+}
+
