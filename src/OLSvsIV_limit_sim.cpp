@@ -201,12 +201,27 @@ List OLSvsIV_onestepCI(double tau, double pi_sq, double size = 0.05,
   arma::mat fmscCIs(n_sim_outer, 2);
   arma::mat avgCIs(n_sim_outer, 2);
   double tauhat_temp;
+  // Calculate the critical values
   for(int i = 0; i < n_sim_outer; i++){
     tauhat_temp = sim_outer.tauhat(i);
     second_step_OLS_IV CIs_temp(tauhat_temp, pi_sq, size, inc, n_sim_inner);
     fmscCIs.row(i) = CIs_temp.fmscCI;
     avgCIs.row(i) = CIs_temp.avgCI;
   }
+  // Calculate realizations for FMSC and AVG estimator
+  double tau_var = (1 - pi_sq) / pi_sq;
+  arma::vec w = tau_var / arma::pow(sim_outer.tauhat, 2);
+  arma::uvec use_ols = arma::find(w >= 0.5);
+  arma::uvec use_tsls = arma::find(w < 0.5);
+  arma::vec fmsc = arma::vec(n_sim_outer);
+  fmsc.elem(use_ols) = sim_outer.ols.elem(use_ols);
+  fmsc.elem(use_tsls) = sim_outer.tsls.elem(use_tsls);
+  arma::vec wavg = arma::clamp(w, 0.0, 1.0);
+  arma::vec avg = wavg % sim_outer.ols + (1 - wavg) % sim_outer.tsls;
+  // Shift critical values by realizations to create CIs
+  fmscCIs.each_col() -= fmsc;
+  avgCIs.each_col() -= avg;
+
   return List::create(Named("fmsc1Cover") = coverage_prob(fmscCIs, 0),
                       Named("avg1Cover") = coverage_prob(avgCIs, 0),
                       Named("fmsc1Width") = median_width(fmscCIs),
