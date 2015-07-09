@@ -2,24 +2,37 @@
 #include "helper_functions.h"
 using namespace Rcpp;
 
-// NEED TO REWRITE THIS TO GENERATE DIRECTLY FROM M1 M2
-// TO AVOID NUMERICAL ISSUES WITH EIGEN-DECOMP WHEN PI_SQ IS SMALL!
 // Class to simulate from the limit experiment for the example from Section 5.1
+// Note that I do not simulate directly from the joint limit experiment for OLS,
+// TSLS and tau_hat since the eigen-decomposition used to generate from the MV
+// normal in my C++ implementation of mvrnorn can become unstable for very small
+// values of pi. Instead I generate M and take a linear transformation to get
+// the desired simulations.
 class limit_sim_OLS_IV {
   public:
     arma::colvec ols, tsls, tauhat, mu;
-    arma::mat S;
+    arma::mat Omega, Psi;
     limit_sim_OLS_IV(double, double, int); //Class constructor
+  private:
+    double p;
+    arma::mat M, sims;
 };
 // Class constructor
 limit_sim_OLS_IV::limit_sim_OLS_IV(double tau, double pi_sq, int n_sim = 10000){
-  double tau_var = (1 - pi_sq) / pi_sq;
-  S << 1 << 1 << 0 << arma::endr
-    << 1 << 1 / pi_sq << -tau_var << arma::endr
-    << 0 << -tau_var << tau_var << arma::endr;
+  p = sqrt(pi_sq);
+  Omega << 1 << p / 3.0 << p / 3.0 << p / 3.0 << arma::endr
+        << p / 3.0 << 1 / 3.0 << 0 << 0 << arma::endr
+        << p / 3.0 << 0 << 1 / 3.0 << 0 << arma::endr
+        << p / 3.0 << 0 << 0 << 1 / 3.0 << arma::endr;
+  Psi << 1 << 0 << 0 << 0 << arma::endr
+      << 0 << 1 / p << 1 / p << 1 / p << arma::endr
+      << 1 << -1 / p << -1 / p << -1 / p << arma::endr;
   mu = arma::vec(3);
   mu(0) = tau; mu(1) = 0; mu(2) = tau;
-  arma::mat sims = mvrnorm(n_sim, mu, S);
+  M = mvrnorm(n_sim, arma::zeros(4), Omega);
+  sims = Psi * M.t();
+  sims.each_col() += mu;
+  sims = sims.t();
   ols = sims.col(0); tsls = sims.col(1); tauhat = sims.col(2);
 }
 
@@ -44,7 +57,8 @@ List OLSvsIV_limit_sim(double tau, double pi_sq, int n_sim = 10000){
   return(List::create(Named("ols") = out.ols,
                       Named("tsls") = out.tsls,
                       Named("tauhat") = out.tauhat,
-                      Named("S") = out.S,
+                      Named("Omega") = out.Omega,
+                      Named("Psi") = out.Psi,
                       Named("mu") = out.mu));
 }
 
