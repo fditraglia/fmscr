@@ -184,6 +184,10 @@ shortest_CI <- function(x, size = 0.05, inc = 0.001) {
     .Call('fmscr_shortest_CI', PACKAGE = 'fmscr', x, size, inc)
 }
 
+clip <- function(x, a, b) {
+    .Call('fmscr_clip', PACKAGE = 'fmscr', x, a, b)
+}
+
 rcpp_hello <- function() {
     .Call('fmscr_rcpp_hello', PACKAGE = 'fmscr')
 }

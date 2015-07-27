@@ -150,6 +150,19 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// clip
+NumericVector clip(NumericVector x, double a, double b);
+RcppExport SEXP fmscr_clip(SEXP xSEXP, SEXP aSEXP, SEXP bSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type a(aSEXP);
+    Rcpp::traits::input_parameter< double >::type b(bSEXP);
+    __result = Rcpp::wrap(clip(x, a, b));
+    return __result;
+END_RCPP
+}
 // rcpp_hello
 List rcpp_hello();
 RcppExport SEXP fmscr_rcpp_hello() {
