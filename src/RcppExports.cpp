@@ -6,64 +6,6 @@
 
 using namespace Rcpp;
 
-// OLSvsIV_limit_sim
-List OLSvsIV_limit_sim(double tau, double pi_sq, int n_sim);
-RcppExport SEXP fmscr_OLSvsIV_limit_sim(SEXP tauSEXP, SEXP pi_sqSEXP, SEXP n_simSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject __result;
-    Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< double >::type tau(tauSEXP);
-    Rcpp::traits::input_parameter< double >::type pi_sq(pi_sqSEXP);
-    Rcpp::traits::input_parameter< int >::type n_sim(n_simSEXP);
-    __result = Rcpp::wrap(OLSvsIV_limit_sim(tau, pi_sq, n_sim));
-    return __result;
-END_RCPP
-}
-// OLSvsIV_nonsimCI
-List OLSvsIV_nonsimCI(double tau, double pi_sq, double size, int n_sim);
-RcppExport SEXP fmscr_OLSvsIV_nonsimCI(SEXP tauSEXP, SEXP pi_sqSEXP, SEXP sizeSEXP, SEXP n_simSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject __result;
-    Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< double >::type tau(tauSEXP);
-    Rcpp::traits::input_parameter< double >::type pi_sq(pi_sqSEXP);
-    Rcpp::traits::input_parameter< double >::type size(sizeSEXP);
-    Rcpp::traits::input_parameter< int >::type n_sim(n_simSEXP);
-    __result = Rcpp::wrap(OLSvsIV_nonsimCI(tau, pi_sq, size, n_sim));
-    return __result;
-END_RCPP
-}
-// OLSvsIV_second_step
-List OLSvsIV_second_step(double tau, double pi_sq, double size, double inc, int n_sim);
-RcppExport SEXP fmscr_OLSvsIV_second_step(SEXP tauSEXP, SEXP pi_sqSEXP, SEXP sizeSEXP, SEXP incSEXP, SEXP n_simSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject __result;
-    Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< double >::type tau(tauSEXP);
-    Rcpp::traits::input_parameter< double >::type pi_sq(pi_sqSEXP);
-    Rcpp::traits::input_parameter< double >::type size(sizeSEXP);
-    Rcpp::traits::input_parameter< double >::type inc(incSEXP);
-    Rcpp::traits::input_parameter< int >::type n_sim(n_simSEXP);
-    __result = Rcpp::wrap(OLSvsIV_second_step(tau, pi_sq, size, inc, n_sim));
-    return __result;
-END_RCPP
-}
-// OLSvsIV_onestepCI
-List OLSvsIV_onestepCI(double tau, double pi_sq, double size, double inc, int n_sim_outer, int n_sim_inner);
-RcppExport SEXP fmscr_OLSvsIV_onestepCI(SEXP tauSEXP, SEXP pi_sqSEXP, SEXP sizeSEXP, SEXP incSEXP, SEXP n_sim_outerSEXP, SEXP n_sim_innerSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject __result;
-    Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< double >::type tau(tauSEXP);
-    Rcpp::traits::input_parameter< double >::type pi_sq(pi_sqSEXP);
-    Rcpp::traits::input_parameter< double >::type size(sizeSEXP);
-    Rcpp::traits::input_parameter< double >::type inc(incSEXP);
-    Rcpp::traits::input_parameter< int >::type n_sim_outer(n_sim_outerSEXP);
-    Rcpp::traits::input_parameter< int >::type n_sim_inner(n_sim_innerSEXP);
-    __result = Rcpp::wrap(OLSvsIV_onestepCI(tau, pi_sq, size, inc, n_sim_outer, n_sim_inner));
-    return __result;
-END_RCPP
-}
 // mvrnorm
 arma::mat mvrnorm(int n, arma::vec mu, arma::mat Sigma);
 RcppExport SEXP fmscr_mvrnorm(SEXP nSEXP, SEXP muSEXP, SEXP SigmaSEXP) {
@@ -160,6 +102,64 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type a(aSEXP);
     Rcpp::traits::input_parameter< double >::type b(bSEXP);
     __result = Rcpp::wrap(clip(x, a, b));
+    return __result;
+END_RCPP
+}
+// OLSvsIV_limit_sim
+List OLSvsIV_limit_sim(double tau, double pi_sq, int n_sim);
+RcppExport SEXP fmscr_OLSvsIV_limit_sim(SEXP tauSEXP, SEXP pi_sqSEXP, SEXP n_simSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< double >::type tau(tauSEXP);
+    Rcpp::traits::input_parameter< double >::type pi_sq(pi_sqSEXP);
+    Rcpp::traits::input_parameter< int >::type n_sim(n_simSEXP);
+    __result = Rcpp::wrap(OLSvsIV_limit_sim(tau, pi_sq, n_sim));
+    return __result;
+END_RCPP
+}
+// OLSvsIV_nonsimCI
+List OLSvsIV_nonsimCI(double tau, double pi_sq, double size, int n_sim);
+RcppExport SEXP fmscr_OLSvsIV_nonsimCI(SEXP tauSEXP, SEXP pi_sqSEXP, SEXP sizeSEXP, SEXP n_simSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< double >::type tau(tauSEXP);
+    Rcpp::traits::input_parameter< double >::type pi_sq(pi_sqSEXP);
+    Rcpp::traits::input_parameter< double >::type size(sizeSEXP);
+    Rcpp::traits::input_parameter< int >::type n_sim(n_simSEXP);
+    __result = Rcpp::wrap(OLSvsIV_nonsimCI(tau, pi_sq, size, n_sim));
+    return __result;
+END_RCPP
+}
+// OLSvsIV_second_step
+List OLSvsIV_second_step(double tau, double pi_sq, double size, double inc, int n_sim);
+RcppExport SEXP fmscr_OLSvsIV_second_step(SEXP tauSEXP, SEXP pi_sqSEXP, SEXP sizeSEXP, SEXP incSEXP, SEXP n_simSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< double >::type tau(tauSEXP);
+    Rcpp::traits::input_parameter< double >::type pi_sq(pi_sqSEXP);
+    Rcpp::traits::input_parameter< double >::type size(sizeSEXP);
+    Rcpp::traits::input_parameter< double >::type inc(incSEXP);
+    Rcpp::traits::input_parameter< int >::type n_sim(n_simSEXP);
+    __result = Rcpp::wrap(OLSvsIV_second_step(tau, pi_sq, size, inc, n_sim));
+    return __result;
+END_RCPP
+}
+// OLSvsIV_onestepCI
+List OLSvsIV_onestepCI(double tau, double pi_sq, double size, double inc, int n_sim_outer, int n_sim_inner);
+RcppExport SEXP fmscr_OLSvsIV_onestepCI(SEXP tauSEXP, SEXP pi_sqSEXP, SEXP sizeSEXP, SEXP incSEXP, SEXP n_sim_outerSEXP, SEXP n_sim_innerSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< double >::type tau(tauSEXP);
+    Rcpp::traits::input_parameter< double >::type pi_sq(pi_sqSEXP);
+    Rcpp::traits::input_parameter< double >::type size(sizeSEXP);
+    Rcpp::traits::input_parameter< double >::type inc(incSEXP);
+    Rcpp::traits::input_parameter< int >::type n_sim_outer(n_sim_outerSEXP);
+    Rcpp::traits::input_parameter< int >::type n_sim_inner(n_sim_innerSEXP);
+    __result = Rcpp::wrap(OLSvsIV_onestepCI(tau, pi_sq, size, inc, n_sim_outer, n_sim_inner));
     return __result;
 END_RCPP
 }
