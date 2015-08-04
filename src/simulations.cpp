@@ -23,6 +23,7 @@ List sim_OLSvsIV(double rho, double pi_sq, int N, int n_reps = 1000){
   arma::vec tsls_estimate(n_reps);
   arma::vec tau(n_reps);
   arma::vec tau_var(n_reps);
+  arma::vec w_avg(n_reps);
 
   for(int i = 0; i < n_reps; i++){
     arma::mat errors = trans(L * reshape(arma::vec(rnorm(2 * N)), 2, N));
@@ -50,6 +51,15 @@ List sim_OLSvsIV(double rho, double pi_sq, int N, int n_reps = 1000){
     tau_var(i) = s_e_sq_tsls(i) * s_x_sq(i) * (s_x_sq(i) / g_sq(i) - 1);
     SE_ols(i) = sqrt(s_e_sq_ols(i) / (N * s_x_sq(i)));
     SE_tsls(i) = sqrt(s_e_sq_tsls(i) / (N * g_sq(i)));
+    double tau_squared_est = pow(tau(i), 2) - tau_var(i);
+    double sq_bias_est;
+    if((tau_squared_est / pow(s_x_sq(i), 2)) >= 0){
+    sq_bias_est = tau_squared_est / pow(s_x_sq(i), 2);
+    } else {
+    sq_bias_est = 0;
+    }
+    double var_diff = s_e_sq_tsls(i) * (1 / g_sq(i) - 1 / s_x_sq(i));
+    w_avg(i) = 1 / (1 + (sq_bias_est / var_diff));
   }
   return(List::create(Named("s_x_sq") = s_x_sq,
                       Named("s_v_sq") = s_v_sq,
@@ -61,5 +71,46 @@ List sim_OLSvsIV(double rho, double pi_sq, int N, int n_reps = 1000){
                       Named("b_ols") = ols_estimate,
                       Named("b_tsls") = tsls_estimate,
                       Named("tau_hat") = tau,
-                      Named("tau_var") = tau_var));
+                      Named("tau_var") = tau_var,
+                      Named("w_avg") = w_avg));
+}
+
+//[[Rcpp::export]]
+List sim_chooseIVs(double rho, double gamma, int N, int n_reps = 1000){
+  RNGScope scope;
+  arma::mat V1(3, 3);
+  V1 << 1.0 << 0.5 - gamma * rho << rho << arma::endr
+     << 0.5 - gamma * rho << 8.0/9.0 - pow(gamma, 2) << 0.0 << arma::endr
+     << rho << 0.0 << 1.0 << arma::endr;
+  arma::mat L = chol(V1, "lower");
+  arma::mat evw = trans(L * reshape(arma::vec(rnorm(3 * N)), 3, N));
+  arma::vec w = evw.col(2);
+  arma::mat Z = reshape(1/sqrt(3) * arma::vec(rnorm(3 * N)), N, 3);
+  arma::vec x = (1.0 / 3.0) * arma::sum(Z,1) + gamma * w + evw.col(1);
+  arma::vec y = 0.5 * x + evw.col(0);
+  //orthogonalize w with respect to Z since we "pretend" we don't know
+  //that w and Z are independent
+  w = w - Z * arma::solve(Z, w);
+  arma::vec pi_hat = arma::solve(Z, x);
+  double ww = arma::dot(w, w);
+  double gamma_hat = arma::dot(x, w) / ww;
+  arma::vec x_valid = Z * pi_hat;
+  arma::vec x_full = x_valid + gamma_hat * w;
+  double b_valid = dot(x_valid, y) / dot(x_valid, x_valid);
+  arma::vec resid_valid = y - b_valid * x;
+  double s_e_valid = dot(resid_valid, resid_valid) / N;
+  double b_full = dot(x_full, y) / dot(x_full, x_full);
+  arma::vec resid_full = y - b_full * x;
+  double s_e_full = dot(resid_full, resid_full) / N;
+
+  double s_w_sq = ww / N;
+  arma::mat Szz = Z.t() * Z.t() / N;
+  double q_sq_valid = as_scalar(pi_hat.t() * Szz * pi_hat);
+  double q_sq_full = q_sq_valid + pow(gamma_hat, 2) * s_w_sq;
+
+  return(List::create(Named("evw") = evw,
+                      Named("w_tilde") = w,
+                      Named("Z") = Z,
+                      Named("x") = x,
+                      Named("y") = y));
 }
