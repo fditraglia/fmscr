@@ -56,3 +56,42 @@ qfmsc <- function(p, tau, bias_coef, tau_sd, efficient_sd){
   uniroot(function(x) pfmsc(x, tau, bias_coef, tau_sd, efficient_sd) - p,
           interval = c(lower, upper))$root
 }
+
+
+cover_naive <- function(alpha, tau, bias_coef, tau_sd, efficient_sd){
+  tau_var <- tau_sd^2
+  z <- qnorm(1 - alpha/2)
+  shift <- bias_coef * tau / efficient_sd
+  cover_efficient <- pnorm(z - shift) - pnorm(-z - shift)
+  prob_efficient <- pnorm(sqrt(2) - tau/tau_sd) - pnorm(-sqrt(2) - tau/tau_sd)
+  p1 <- prob_efficient * cover_efficient
+  S <- matrix(c(bias_coef^2 * tau_var + efficient_sd^2, -bias_coef * tau_var,
+                -bias_coef * tau_var, tau_var),
+              byrow = TRUE, nrow = 2, ncol = 2)
+  ell <- z * sqrt(efficient_sd^2 + bias_coef^2 * tau_var)
+  p2lower <- mvtnorm::pmvnorm(sigma = S,
+                              lower = c(-ell, -Inf),
+                              upper = c(ell, -tau_sd * sqrt(2) - tau))
+  p2upper <- mvtnorm::pmvnorm(sigma = S,
+                              lower = c(-ell, tau_sd * sqrt(2) - tau),
+                              upper = c(ell, Inf))
+  out <- p1 + p2lower + p2upper
+  attr(out, which = "error") <- NULL
+  attr(out, which = "msg") <- NULL
+  return(out)
+}
+
+# cover_eff <- function(alpha, tau, bias_coef, efficient_sd){
+#   z <- qnorm(1 - alpha/2)
+#   shift <- bias_coef * tau / efficient_sd
+#   pnorm(z - shift) - pnorm(-z - shift)
+# }
+#
+# p_eff <- function(tau, tau_sd){
+#  pnorm(sqrt(2) - tau/tau_sd) - pnorm(-sqrt(2) - tau/tau_sd)
+# }
+#
+# rel_width <- function(bias_coef, tau_sd, efficient_sd){
+#  efficient_sd / sqrt(efficient_sd^2 + bias_coef^2 * tau_sd^2)
+# }
+
