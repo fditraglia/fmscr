@@ -94,23 +94,41 @@ List sim_chooseIVs(double rho, double gamma, int N, int n_reps = 1000){
   arma::vec pi_hat = arma::solve(Z, x);
   double ww = arma::dot(w, w);
   double gamma_hat = arma::dot(x, w) / ww;
+
   arma::vec x_valid = Z * pi_hat;
-  arma::vec x_full = x_valid + gamma_hat * w;
   double b_valid = dot(x_valid, y) / dot(x_valid, x_valid);
   arma::vec resid_valid = y - b_valid * x;
-  double s_e_valid = dot(resid_valid, resid_valid) / N;
+  double s_e_sq_valid = dot(resid_valid, resid_valid) / N;
+
+  arma::vec x_full = x_valid + gamma_hat * w;
   double b_full = dot(x_full, y) / dot(x_full, x_full);
   arma::vec resid_full = y - b_full * x;
-  double s_e_full = dot(resid_full, resid_full) / N;
+  double s_e_sq_full = dot(resid_full, resid_full) / N;
 
   double s_w_sq = ww / N;
-  arma::mat Szz = Z.t() * Z.t() / N;
+  arma::mat Szz = Z.t() * Z / N;
   double q_sq_valid = as_scalar(pi_hat.t() * Szz * pi_hat);
   double q_sq_full = q_sq_valid + pow(gamma_hat, 2) * s_w_sq;
+  double SE_valid = sqrt(s_e_sq_valid / (N * q_sq_valid));
+  double SE_full = sqrt(s_e_sq_full / (N * q_sq_full));
+  double tau_hat = dot(w, resid_valid) / sqrt(N);
+  double tau_var = s_w_sq * s_e_sq_valid * q_sq_full / q_sq_valid;
 
-  return(List::create(Named("evw") = evw,
+  return List::create(Named("evw") = evw,
                       Named("w_tilde") = w,
                       Named("Z") = Z,
                       Named("x") = x,
-                      Named("y") = y));
+                      Named("y") = y,
+                      Named("s_w_sq") = s_w_sq,
+                      Named("gamma") = gamma_hat,
+                      Named("q_sq_valid") = q_sq_valid,
+                      Named("q_sq_full") = q_sq_full,
+                      Named("s_e_sq_valid") = s_e_sq_valid,
+                      Named("s_e_sq_full") = s_e_sq_full,
+                      Named("SE_valid") = SE_valid,
+                      Named("SE_full") = SE_full,
+                      Named("b_valid") = b_valid,
+                      Named("b_full") = b_full,
+                      Named("tau_hat") = tau_hat,
+                      Named("tau_var") = tau_var);
 }
