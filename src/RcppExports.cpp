@@ -173,3 +173,31 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// sim_OLSvsIV
+List sim_OLSvsIV(double rho, double pi_sq, int N, int n_reps);
+RcppExport SEXP fmscr_sim_OLSvsIV(SEXP rhoSEXP, SEXP pi_sqSEXP, SEXP NSEXP, SEXP n_repsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< double >::type rho(rhoSEXP);
+    Rcpp::traits::input_parameter< double >::type pi_sq(pi_sqSEXP);
+    Rcpp::traits::input_parameter< int >::type N(NSEXP);
+    Rcpp::traits::input_parameter< int >::type n_reps(n_repsSEXP);
+    __result = Rcpp::wrap(sim_OLSvsIV(rho, pi_sq, N, n_reps));
+    return __result;
+END_RCPP
+}
+// sim_chooseIVs
+List sim_chooseIVs(double rho, double gamma, int N, int n_reps);
+RcppExport SEXP fmscr_sim_chooseIVs(SEXP rhoSEXP, SEXP gammaSEXP, SEXP NSEXP, SEXP n_repsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< double >::type rho(rhoSEXP);
+    Rcpp::traits::input_parameter< double >::type gamma(gammaSEXP);
+    Rcpp::traits::input_parameter< int >::type N(NSEXP);
+    Rcpp::traits::input_parameter< int >::type n_reps(n_repsSEXP);
+    __result = Rcpp::wrap(sim_chooseIVs(rho, gamma, N, n_reps));
+    return __result;
+END_RCPP
+}

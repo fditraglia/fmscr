@@ -192,3 +192,11 @@ rcpp_hello <- function() {
     .Call('fmscr_rcpp_hello', PACKAGE = 'fmscr')
 }
 
+sim_OLSvsIV <- function(rho, pi_sq, N, n_reps = 1000L) {
+    .Call('fmscr_sim_OLSvsIV', PACKAGE = 'fmscr', rho, pi_sq, N, n_reps)
+}
+
+sim_chooseIVs <- function(rho, gamma, N, n_reps = 1000L) {
+    .Call('fmscr_sim_chooseIVs', PACKAGE = 'fmscr', rho, gamma, N, n_reps)
+}
+
