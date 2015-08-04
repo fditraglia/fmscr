@@ -81,17 +81,9 @@ cover_naive <- function(alpha, tau, bias_coef, tau_sd, efficient_sd){
   return(out)
 }
 
-# cover_eff <- function(alpha, tau, bias_coef, efficient_sd){
-#   z <- qnorm(1 - alpha/2)
-#   shift <- bias_coef * tau / efficient_sd
-#   pnorm(z - shift) - pnorm(-z - shift)
-# }
-#
-# p_eff <- function(tau, tau_sd){
-#  pnorm(sqrt(2) - tau/tau_sd) - pnorm(-sqrt(2) - tau/tau_sd)
-# }
-#
-# rel_width <- function(bias_coef, tau_sd, efficient_sd){
-#  efficient_sd / sqrt(efficient_sd^2 + bias_coef^2 * tau_sd^2)
-# }
+expect_rel_width <- function(tau, bias_coef, tau_sd, efficient_sd){
+  pA <- pnorm(sqrt(2) - tau/tau_sd) - pnorm(-sqrt(2) - tau/tau_sd)
+  rel_width <- sqrt(efficient_sd^2 / (efficient_sd^2 + bias_coef^2 * tau_sd^2))
+  return(rel_width * pA + (1 - pA))
+}
 
