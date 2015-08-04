@@ -83,43 +83,50 @@ List sim_chooseIVs(double rho, double gamma, int N, int n_reps = 1000){
      << 0.5 - gamma * rho << 8.0/9.0 - pow(gamma, 2) << 0.0 << arma::endr
      << rho << 0.0 << 1.0 << arma::endr;
   arma::mat L = chol(V1, "lower");
-  arma::mat evw = trans(L * reshape(arma::vec(rnorm(3 * N)), 3, N));
-  arma::vec w = evw.col(2);
-  arma::mat Z = reshape(1/sqrt(3) * arma::vec(rnorm(3 * N)), N, 3);
-  arma::vec x = (1.0 / 3.0) * arma::sum(Z,1) + gamma * w + evw.col(1);
-  arma::vec y = 0.5 * x + evw.col(0);
-  //orthogonalize w with respect to Z since we "pretend" we don't know
-  //that w and Z are independent
-  w = w - Z * arma::solve(Z, w);
-  arma::vec pi_hat = arma::solve(Z, x);
-  double ww = arma::dot(w, w);
-  double gamma_hat = arma::dot(x, w) / ww;
 
-  arma::vec x_valid = Z * pi_hat;
-  double b_valid = dot(x_valid, y) / dot(x_valid, x_valid);
-  arma::vec resid_valid = y - b_valid * x;
-  double s_e_sq_valid = dot(resid_valid, resid_valid) / N;
+  arma::vec s_w_sq(n_reps);
+  arma::vec gamma_hat(n_reps);
+  arma::vec q_sq_valid(n_reps);
+  arma::vec q_sq_full(n_reps);
+  arma::vec s_e_sq_valid(n_reps);
+  arma::vec s_e_sq_full(n_reps);
+  arma::vec SE_valid(n_reps);
+  arma::vec SE_full(n_reps);
+  arma::vec b_valid(n_reps);
+  arma::vec b_full(n_reps);
+  arma::vec tau_hat(n_reps);
+  arma::vec tau_var(n_reps);
 
-  arma::vec x_full = x_valid + gamma_hat * w;
-  double b_full = dot(x_full, y) / dot(x_full, x_full);
-  arma::vec resid_full = y - b_full * x;
-  double s_e_sq_full = dot(resid_full, resid_full) / N;
-
-  double s_w_sq = ww / N;
-  arma::mat Szz = Z.t() * Z / N;
-  double q_sq_valid = as_scalar(pi_hat.t() * Szz * pi_hat);
-  double q_sq_full = q_sq_valid + pow(gamma_hat, 2) * s_w_sq;
-  double SE_valid = sqrt(s_e_sq_valid / (N * q_sq_valid));
-  double SE_full = sqrt(s_e_sq_full / (N * q_sq_full));
-  double tau_hat = dot(w, resid_valid) / sqrt(N);
-  double tau_var = s_w_sq * s_e_sq_valid * q_sq_full / q_sq_valid;
-
-  return List::create(Named("evw") = evw,
-                      Named("w_tilde") = w,
-                      Named("Z") = Z,
-                      Named("x") = x,
-                      Named("y") = y,
-                      Named("s_w_sq") = s_w_sq,
+  for(int i = 0; i < n_reps; i++){
+    arma::mat evw = trans(L * reshape(arma::vec(rnorm(3 * N)), 3, N));
+    arma::vec w = evw.col(2);
+    arma::mat Z = reshape(1/sqrt(3) * arma::vec(rnorm(3 * N)), N, 3);
+    arma::vec x = (1.0 / 3.0) * arma::sum(Z,1) + gamma * w + evw.col(1);
+    arma::vec y = 0.5 * x + evw.col(0);
+    //orthogonalize w with respect to Z since we "pretend" we don't know
+    //that w and Z are independent
+    w = w - Z * arma::solve(Z, w);
+    arma::vec pi_hat = arma::solve(Z, x);
+    double ww = arma::dot(w, w);
+    gamma_hat(i) = arma::dot(x, w) / ww;
+    arma::vec x_valid = Z * pi_hat;
+    b_valid(i) = dot(x_valid, y) / dot(x_valid, x_valid);
+    arma::vec resid_valid = y - b_valid(i) * x;
+    s_e_sq_valid(i) = dot(resid_valid, resid_valid) / N;
+    arma::vec x_full = x_valid + gamma_hat(i) * w;
+    b_full(i) = dot(x_full, y) / dot(x_full, x_full);
+    arma::vec resid_full = y - b_full(i) * x;
+    s_e_sq_full(i) = dot(resid_full, resid_full) / N;
+    s_w_sq(i) = ww / N;
+    arma::mat Szz = Z.t() * Z / N;
+    q_sq_valid(i) = as_scalar(pi_hat.t() * Szz * pi_hat);
+    q_sq_full(i) = q_sq_valid(i) + pow(gamma_hat(i), 2) * s_w_sq(i);
+    SE_valid(i) = sqrt(s_e_sq_valid(i) / (N * q_sq_valid(i)));
+    SE_full(i) = sqrt(s_e_sq_full(i) / (N * q_sq_full(i)));
+    tau_hat(i) = dot(w, resid_valid) / sqrt(N);
+    tau_var(i) = s_w_sq(i) * s_e_sq_valid(i) * q_sq_full(i) / q_sq_valid(i);
+  }
+  return List::create(Named("s_w_sq") = s_w_sq,
                       Named("gamma") = gamma_hat,
                       Named("q_sq_valid") = q_sq_valid,
                       Named("q_sq_full") = q_sq_full,
