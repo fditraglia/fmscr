@@ -81,6 +81,33 @@ cover_naive <- function(alpha, tau, bias_coef, tau_sd, efficient_sd){
   return(out)
 }
 
+shortestCI_fmsc <- function(alpha, tau, bias_coef, tau_sd, efficient_sd){
+  g <- function(a_lower){
+    lower <- qfmsc(a_lower, tau, bias_coef, tau_sd, efficient_sd)
+    upper <- qfmsc(1 - (alpha - a_lower), tau, bias_coef, tau_sd, efficient_sd)
+    upper - lower
+  }
+  a_star <- optimize(g, c(0.001, alpha - 0.001))$minimum
+  lower <- qfmsc(a_star, tau, bias_coef, tau_sd, efficient_sd)
+  upper <- qfmsc(1 - (alpha - a_star), tau, bias_coef, tau_sd, efficient_sd)
+  return(c(lower, upper))
+}
+
+rel_width_FMSCinfeas <- function(alpha, tau, bias_coef, tau_sd, efficient_sd,
+                                 equal.tailed = TRUE){
+  valid_sd <- sqrt(efficient_sd^2 + bias_coef^2 * tau_sd^2)
+  valid_width <- 2 * qnorm(1 - alpha/2) * valid_sd
+  if(equal.tailed){
+    lower <- qfmsc(alpha/2, tau, bias_coef, tau_sd, efficient_sd)
+    upper <- qfmsc(1 - alpha/2, tau, bias_coef, tau_sd, efficient_sd)
+  }else{
+    CI <- shortestCI_fmsc(alpha, tau, bias_coef, tau_sd, efficient_sd)
+    lower <- CI[1]
+    upper <- CI[2]
+  }
+  return((upper - lower) / valid_width)
+}
+
 expect_rel_width <- function(tau, bias_coef, tau_sd, efficient_sd){
   pA <- pnorm(sqrt(2) - tau/tau_sd) - pnorm(-sqrt(2) - tau/tau_sd)
   rel_width <- sqrt(efficient_sd^2 / (efficient_sd^2 + bias_coef^2 * tau_sd^2))
