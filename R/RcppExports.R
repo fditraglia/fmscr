@@ -108,8 +108,8 @@ shortest_CI <- function(x, size = 0.05, inc = 0.001) {
     .Call('fmscr_shortest_CI', PACKAGE = 'fmscr', x, size, inc)
 }
 
-clip <- function(x, a, b) {
-    .Call('fmscr_clip', PACKAGE = 'fmscr', x, a, b)
+myclip <- function(x, a, b) {
+    .Call('fmscr_myclip', PACKAGE = 'fmscr', x, a, b)
 }
 
 #' Testing interface to limit_sim_OLS_IV class.

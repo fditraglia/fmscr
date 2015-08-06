@@ -163,7 +163,7 @@ arma::rowvec shortest_CI(arma::vec x, double size = 0.05, double inc = 0.001){
 }
 
 // [[Rcpp::export]]
-NumericVector clip(NumericVector x, double a, double b){
+NumericVector myclip(NumericVector x, double a, double b){
   return clamp(a, x, b);
 }
 

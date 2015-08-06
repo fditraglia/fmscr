@@ -46,9 +46,9 @@ qfmsc <- function(p, tau, bias_coef, tau_sd, efficient_sd){
   Kplus <- pnorm(sqrt(2) - tau/tau_sd)
   Kminus <- pnorm(-sqrt(2) - tau/tau_sd)
   z1 <- bias_coef * tau +
-    efficient_sd * qnorm(fmscr::clip(p / (Kplus - Kminus), 0, 1))
+    efficient_sd * qnorm(fmscr::myclip(p / (Kplus - Kminus), 0, 1))
   z2 <- bias_coef * tau + (bias_coef < 0) * bias_coef * tau_sd * sqrt(2) +
-    efficient_sd * qnorm(fmscr::clip(1 + (p - 1) / Kplus, 0, 1))
+    efficient_sd * qnorm(fmscr::myclip(1 + (p - 1) / Kplus, 0, 1))
   z_lower <- min(z1, z2)
   z_upper <- max(z1, z2)
   lower <- max(x_lower, z_lower)
