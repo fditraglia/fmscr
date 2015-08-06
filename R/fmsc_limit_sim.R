@@ -114,3 +114,65 @@ expect_rel_width <- function(tau, bias_coef, tau_sd, efficient_sd){
   return(rel_width * pA + (1 - pA))
 }
 
+onestepCI <- function(alpha, tau, bias_coef, tau_sd, efficient_sd,
+                     equal.tailed = TRUE, ndraws = 500){
+  tau_draws <- rnorm(ndraws, tau, tau_sd)
+  if(equal.tailed){
+  qlower <- sapply(tau_draws, function(x)
+    qfmsc(p = alpha/2, tau = x, bias_coef, tau_sd, efficient_sd))
+  qupper <- sapply(tau_draws, function(x)
+    qfmsc(p = 1 - alpha/2, tau = x, bias_coef, tau_sd, efficient_sd))
+  }else{
+    CIs <- sapply(tau_draws, function(x)
+      shortestCI_fmsc(alpha, tau = x, bias_coef, tau_sd, efficient_sd))
+    qlower <- CIs[1,]
+    qupper <- CIs[2,]
+  }
+  widths <- abs(qupper - qlower)
+  pupper <- sapply(qupper, function(q)
+    pfmsc(q, tau, bias_coef, tau_sd, efficient_sd))
+  plower <- sapply(qlower, function(q)
+    pfmsc(q, tau, bias_coef, tau_sd, efficient_sd))
+  cprob <- pupper - plower
+  return(data.frame(avgwidth = mean(widths), coverage = mean(cprob)))
+}
+
+twostepCI <- function(alpha, tau, bias_coef, tau_sd, efficient_sd,
+                      a1 = alpha/2, ndraws = 500){
+  tau_draws <- rnorm(ndraws, tau, tau_sd)
+  ME <- qnorm(1 - a1/2) * tau_sd
+  a2 <- alpha - a1
+  get_lower <- function(tau_hat){
+    optimize(function(x) qfmsc(a2/2, tau = x, bias_coef, tau_sd, efficient_sd),
+           lower = tau_hat - ME, upper = tau_hat + ME, tol = 0.01)$objective
+  }
+  get_upper <- function(tau_hat){
+    optimize(function(x) qfmsc(1 - a2/2, tau = x, bias_coef, tau_sd, efficient_sd),
+           lower = tau_hat - ME, upper = tau_hat + ME, tol = 0.01,
+           maximum = TRUE)$objective
+  }
+  qlower <- sapply(tau_draws, get_lower)
+  qupper <- sapply(tau_draws, get_upper)
+  widths <- abs(qupper - qlower)
+  pupper <- sapply(qupper, function(q)
+    pfmsc(q, tau, bias_coef, tau_sd, efficient_sd))
+  plower <- sapply(qlower, function(q)
+    pfmsc(q, tau, bias_coef, tau_sd, efficient_sd))
+  cprob <- pupper - plower
+  return(data.frame(avgwidth = mean(widths), coverage = mean(cprob)))
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
