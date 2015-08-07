@@ -163,6 +163,21 @@ twostepCI <- function(alpha, tau, bias_coef, tau_sd, efficient_sd,
 }
 
 
+get_twostepCI <- function(alpha, tau_hat, bias_coef, tau_sd, efficient_sd,
+                      a1 = alpha/2){
+  ME <- qnorm(1 - a1/2) * tau_sd
+  a2 <- alpha - a1
+  lower <- optimize(function(x)
+    qfmsc(a2/2, tau = x, bias_coef, tau_sd, efficient_sd),
+    lower = tau_hat - ME, upper = tau_hat + ME, tol = 0.01)$objective
+
+  upper <- optimize(function(x)
+    qfmsc(1 - a2/2, tau = x, bias_coef, tau_sd, efficient_sd),
+    lower = tau_hat - ME, upper = tau_hat + ME, tol = 0.01,
+    maximum = TRUE)$objective
+
+  return(c(lower, upper))
+}
 
 
 
