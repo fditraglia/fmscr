@@ -92,7 +92,9 @@ CIsim_OLSvsIV <- function(alpha, rho, pi_sq, N, n_reps){
   return(out)
 }
 
-CIsim_chooseIVs <- function(alpha, rho, gamma, N, n_reps){
+CIsim_chooseIVs <- function(alpha, rho, g_sq, N, n_reps){
+
+  gamma <- sqrt(g_sq)
 
   sim_data <- as.data.frame(sim_chooseIVs(rho, gamma, N, n_reps))
   sim_data$tau_sd <- sqrt(sim_data$tau_var)
