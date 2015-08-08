@@ -49,7 +49,7 @@ qfmsc <- function(p, tau, bias_coef, tau_sd, efficient_sd){
     efficient_sd * qnorm(fmscr::myclip(p / (Kplus - Kminus), 0, 1))
   if(bias_coef < 0){
   z2 <- bias_coef * tau +
-    efficient_sd * qnorm(fmscr::myclip((p - Kminus) / Kminus, 0, 1))
+    efficient_sd * qnorm(fmscr::myclip((p - Kminus) / (1 - Kminus), 0, 1))
   }else{
   z2 <- bias_coef * tau +
     efficient_sd * qnorm(fmscr::myclip(1 + (p - 1) / Kplus, 0, 1))
